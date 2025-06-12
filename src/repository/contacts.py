@@ -44,6 +44,10 @@ class ContactRepository:
         self: Self, body: ContactBase, user: User
     ) -> Contact | None:
         contact = Contact(**body.model_dump(exclude_unset=True), user=user)
+        exist_contact = await self.get_contact_by_email(contact.email, user)
+        if exist_contact:
+            return None
+
         self.db.add(contact)
         await self.db.commit()
         await self.db.refresh(contact)
@@ -104,3 +108,12 @@ class ContactRepository:
 
         result = await self.db.execute(stmt)
         return result.scalars().all()
+
+    async def get_contact_by_email(
+        self: Self, contact_email: str, user: User
+    ) -> Contact | None:
+        stmt = select(Contact).filter(
+            Contact.user_id == user.id, Contact.email == contact_email
+        )
+        result = await self.db.execute(stmt)
+        return result.scalar_one_or_none()

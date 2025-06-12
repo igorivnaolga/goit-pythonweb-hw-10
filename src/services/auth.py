@@ -6,7 +6,7 @@ from fastapi import Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from src.conf.config import config
-from src.repository.users import UserRepository
+from src.services.users import UserService
 from src.database.db import get_db
 
 
@@ -60,10 +60,11 @@ class Auth:
                     raise credentials_exception
             else:
                 raise credentials_exception
-        except JWTError as e:
+        except JWTError:
             raise credentials_exception
 
-        user = await UserRepository.get_user_by_email(email)
+        user_service = UserService(db)
+        user = await user_service.get_user_by_email(email)
 
         if user is None:
             raise credentials_exception
