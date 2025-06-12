@@ -1,24 +1,68 @@
-import configparser
-
-# Load config.ini
-parser = configparser.ConfigParser()
-parser.read("src/conf/config.ini")
-
-# Read DB credentials from the config file
-db_user = parser.get("DB", "USER")
-db_password = parser.get("DB", "PASSWORD")
-db_name = parser.get("DB", "DB_NAME")
-db_host = parser.get("DB", "DOMAIN")
-db_port = parser.get("DB", "PORT")
+from pydantic import ConfigDict
+from pydantic_settings import BaseSettings
+from typing import Self
 
 
-class Config:
-    DB_URL = (
-        f"postgresql+asyncpg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+class Settings(BaseSettings):
+    # DB
+    POSTGRES_DB: str
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_PORT: str
+    POSTGRES_HOST: str
+    # JWT
+    JWT_SECRET: str
+    JWT_ALGORITHM: str = "HS256"
+    JWT_EXPIRATION_SECONDS: int = 3600
+    # EMAIL
+    MAIL_USERNAME: str
+    MAIL_PASSWORD: str
+    MAIL_FROM: str
+    MAIL_PORT: str
+    MAIL_SERVER: str
+    MAIL_FROM_NAME: str = "API SERVICE"
+    MAIL_STARTTLS: bool = False
+    MAIL_SSL_TLS: bool = True
+    MAIL_USE_CREDENTIALS: bool = True
+    MAIL_VALIDATE_CERTS: bool = True
+    # CLOUDINARY
+    CLOUDINARY_NAME: str
+    CLOUDINARY_API_KEY: str
+    CLOUDINARY_API_SECRET: str
+    # CONFIG
+    model_config = ConfigDict(
+        extra="ignore", env_file=".env", env_file_encoding="utf-8", case_sensitive=True
     )
-    JWT_SECRET = "your_secret_key"  # Секретний ключ для токенів
-    JWT_ALGORITHM = "HS256"  # Алгоритм шифрування токенів
-    JWT_EXPIRATION_SECONDS = 3600  # Час дії токена (1 година)
+
+    @property
+    def database_url(self: Self):
+        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
 
-config = Config
+settings = Settings()
+
+
+# import configparser
+
+# # Load config.ini
+# parser = configparser.ConfigParser()
+# parser.read("src/conf/config.ini")
+
+# # Read DB credentials from the config file
+# db_user = parser.get("DB", "USER")
+# db_password = parser.get("DB", "PASSWORD")
+# db_name = parser.get("DB", "DB_NAME")
+# db_host = parser.get("DB", "DOMAIN")
+# db_port = parser.get("DB", "PORT")
+
+
+# class Config:
+#     DB_URL = (
+#         f"postgresql+asyncpg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+#     )
+#     JWT_SECRET = "your_secret_key"  # Секретний ключ для токенів
+#     JWT_ALGORITHM = "HS256"  # Алгоритм шифрування токенів
+#     JWT_EXPIRATION_SECONDS = 3600  # Час дії токена (1 година)
+
+
+# config = Config

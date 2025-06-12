@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.models import User
-from src.schemas.users import UserCreate
+from src.schemas.users import UserCreate, UserResponse
 
 
 class UserRepository:
@@ -34,10 +34,14 @@ class UserRepository:
         await self.db.refresh(user)
         return user
 
-    async def change_confirmed_email(self: Self, user_email: str) -> None:
+    async def confirmed_email(self: Self, user_email: str) -> None:
         user = await self.get_user_by_email(user_email)
         user.confirmed_email = True
         await self.db.commit()
 
-    async def update_token(self: Self, access_token: str) -> None:
-        pass
+    async def update_avatar(self: Self, email: str, url: str) -> UserResponse:
+        user = await self.get_user_by_email(email)
+        user.avatar = url
+        await self.db.commit()
+        await self.db.refresh(user)
+        return user

@@ -24,3 +24,9 @@ class UserService:
 
     async def get_user_by_name(self: Self, username: str):
         return await self.repository.get_user_by_name(username)
+
+    async def confirmed_email(self: Self, email: str):
+        return await self.repository.confirmed_email(email)
+
+    async def update_avatar(self: Self, email: str, avatar_url: str):
+        return await self.repository.update_avatar(email, avatar_url)

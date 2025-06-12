@@ -5,13 +5,13 @@ from datetime import datetime, timedelta
 from fastapi import Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from src.conf.config import config
+from src.conf.config import settings
 from src.services.users import UserService
 from src.database.db import get_db
 
 
 class Auth:
-    ALGORITHM = config.JWT_ALGORITHM
+    ALGORITHM = settings.JWT_ALGORITHM
 
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
@@ -29,7 +29,7 @@ class Auth:
             {"iat": datetime.utcnow(), "exp": expire, "scope": "access_token"}
         )
         encoded_access_token = jwt.encode(
-            to_encode, config.JWT_SECRET, algorithm=self.ALGORITHM
+            to_encode, settings.JWT_SECRET, algorithm=self.ALGORITHM
         )
         return encoded_access_token
 
@@ -39,7 +39,7 @@ class Auth:
         to_encode.update(
             {"iat": datetime.utcnow(), "exp": expire, "scope": "email_token"}
         )
-        token = jwt.encode(to_encode, config.JWT_SECRET, algorithm=self.ALGORITHM)
+        token = jwt.encode(to_encode, settings.JWT_SECRET, algorithm=self.ALGORITHM)
         return token
 
     async def get_current_user(
@@ -53,7 +53,9 @@ class Auth:
 
         try:
             # Decode JWT
-            payload = jwt.decode(token, config.JWT_SECRET, algorithms=[self.ALGORITHM])
+            payload = jwt.decode(
+                token, settings.JWT_SECRET, algorithms=[self.ALGORITHM]
+            )
             if payload.get("scope") == "access_token":
                 email = payload.get("sub")
                 if email is None:
@@ -72,7 +74,9 @@ class Auth:
 
     def get_email_from_token(self, token: str):
         try:
-            payload = jwt.decode(token, config.JWT_SECRET, algorithms=[self.ALGORITHM])
+            payload = jwt.decode(
+                token, settings.JWT_SECRET, algorithms=[self.ALGORITHM]
+            )
             if payload["scope"] == "email_token":
                 email = payload["sub"]
                 return email
