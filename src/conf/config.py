@@ -12,19 +12,19 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str
     # JWT
     JWT_SECRET: str
-    JWT_ALGORITHM: str = "HS256"
-    JWT_EXPIRATION_SECONDS: int = 3600
+    JWT_ALGORITHM: str
+    JWT_EXPIRATION_SECONDS: int
     # EMAIL
     MAIL_USERNAME: str
     MAIL_PASSWORD: str
     MAIL_FROM: str
     MAIL_PORT: str
     MAIL_SERVER: str
-    MAIL_FROM_NAME: str = "API SERVICE"
-    MAIL_STARTTLS: bool = False
-    MAIL_SSL_TLS: bool = True
-    MAIL_USE_CREDENTIALS: bool = True
-    MAIL_VALIDATE_CERTS: bool = True
+    MAIL_FROM_NAME: str
+    MAIL_STARTTLS: bool
+    MAIL_SSL_TLS: bool
+    MAIL_USE_CREDENTIALS: bool
+    MAIL_VALIDATE_CERTS: bool
     # CLOUDINARY
     CLOUDINARY_NAME: str
     CLOUDINARY_API_KEY: str
