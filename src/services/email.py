@@ -1,4 +1,5 @@
 from pathlib import Path
+import traceback
 
 from fastapi_mail import ConnectionConfig, MessageSchema, MessageType, FastMail
 from fastapi_mail.errors import ConnectionErrors
@@ -35,6 +36,9 @@ async def send_email(email: str, username: str, host: str):
             subtype=MessageType.html,
         )
         fm = FastMail(conf)
+        print("Sending email to:", email)
         await fm.send_message(message, template_name="email_template.html")
-    except ConnectionErrors as err:
-        print(err)
+        print("Email sent!")
+    except Exception as err:
+        print("Email error:", err)
+        traceback.print_exc()
